@@ -8,7 +8,7 @@ import torch
 from torch import nn
 import torch
 
-from clip.simple_tokenizer import SimpleTokenizer as _Tokenizer
+from mmovod.modeling.clip.simple_tokenizer import SimpleTokenizer as _Tokenizer
 
 __all__ = ["tokenize"]
 
@@ -71,7 +71,7 @@ class CLIPTEXT(nn.Module):
                  context_length=77,
                  vocab_size=49408,
                  transformer_width=512,
-                 transformer_heads=8,
+                 transformer_heads=512//64,
                  transformer_layers=12
                  ):
         super().__init__()
@@ -161,6 +161,17 @@ class CLIPTEXT(nn.Module):
         # take features from the eot embedding (eot_token is the highest number in each sequence)
         x = x[torch.arange(x.shape[0]), text.argmax(dim=-1)] @ self.text_projection
         return x
+    
+    def forward_embedding(self, x, eos_index):
+        # x = self.token_embedding(text).type(self.dtype)  # [batch_size, n_ctx, d_model]
+        x = x + self.positional_embedding.type(self.dtype)
+        x = x.permute(1, 0, 2)  # NLD -> LND
+        x = self.transformer(x)
+        x = x.permute(1, 0, 2)  # LND -> NLD
+        x = self.ln_final(x).type(self.dtype)
+        # take features from the eot embedding (eot_token is the highest number in each sequence)
+        x = x[torch.arange(x.shape[0]), eos_index] @ self.text_projection
+        return x
 
     def forward(self, captions):
         '''
@@ -171,11 +182,13 @@ class CLIPTEXT(nn.Module):
         return features
 
 
-def build_text_encoder(pretrain=True):
+def build_text_encoder(pretrain=True, model_name="ViT-B/32"):
     text_encoder = CLIPTEXT()
     if pretrain:
         import clip
-        pretrained_model, _ = clip.load("ViT-B/32", device='cpu')
+        # pretrained_model = torch.load("../../pretrained_models/ViT-L-14-336px.pt", map_location="cpu")
+        # print("load clip from ../../pretrained_models/ViT-L-14-336px.pt !!!!!!!!!!!")
+        pretrained_model, _ = clip.load(model_name, device='cpu')
         state_dict = pretrained_model.state_dict()
         to_delete_keys = ["logit_scale", "input_resolution", \
         "context_length", "vocab_size"] + \

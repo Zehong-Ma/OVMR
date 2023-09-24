@@ -130,7 +130,7 @@ python tools/dump_clip_features_lvis_sentences.py --descriptions-path datasets/m
 used in the paper and produce our results.
 One can create their own as follows:
 ~~~
-python tools/sample_exemplars.py --lvis-ann-path datasets/lvis/lvis_v1_val.json --exemplar-dict-path datasets/metadata/exemplar_dict.json -K 5 --out-path datasets/metadata/lvis_image_exemplar_dict_K-005_own.json
+python tools/sample_exemplars.py --lvis-ann-path datasets/lvis/lvis_v1_val.json --exemplar-dict-path datasets/metadata/exemplar_dict.json -K 40 --out-path datasets/metadata/lvis_image_exemplar_dict_final_own.json
 ~~~
 
 `lvis_image_exemplar_features_agg_K-005_author.npy` is the CLIP embeddings for each class in the LVIS dataset
@@ -146,7 +146,7 @@ when using image examplars AND averaging the CLIP embeddings of multiple exempla
 aggregator).
 One can create their own for example:
 ~~~
-python tools/get_exemplars_tta.py --ann-path /users/prannay/mm-ovod/datasets/metadata/lvis_image_exemplar_dict_K-005_own.json --output-path datasets/metadata/lvis_image_exemplar_features_avg_K-005_own.npy --num-augs 5
+python tools/get_exemplars_tta.py --ann-path datasets/metadata/lvis_image_exemplar_dict_20_own_first10.json --output-path datasets/metadata/lvis_image_exemplar_features_avg_10_own.npy --num-augs 5
 ~~~
 
 `lvis_multi-modal_agg_K-005_author.npy` is the CLIP embeddings for each class in the LVIS dataset
@@ -160,7 +160,7 @@ python tools/norm_feat_sum_norm.py --feat1-path datasets/metadata/lvis_gpt3_text
 when using image examplars AND descriptions AND averaging the CLIP embeddings of multiple exemplars (not using our trained aggregator).
 One can create their own for example:
 ~~~
-python tools/norm_feat_sum_norm.py --feat1-path datasets/metadata/lvis_gpt3_text-davinci-002_features_own.npy --feat2-path datasets/metadata/lvis_image_exemplar_features_avg_K-005_own.npy --out-path datasets/metadata/lvis_multi-modal_avg_K-005_own.npy
+python tools/norm_feat_sum_norm.py --feat1-path datasets/metadata/lvis_gpt3_text-davinci-002_features_author.npy --feat2-path datasets/metadata/lvis_image_exemplar_features_avg_10_own.npy --out-path datasets/metadata/lvis_multi-modal_avg_K-010_mmovd.npy
 ~~~
 
 `lvis_clip_a+cname.npy` is the pre-computed CLIP embeddings for each class in the LVIS dataset (from Detic)
@@ -177,7 +177,7 @@ However, if you wish to create your own, one first needs to create a full dictio
 LVIS category.
 This is done by:
 ~~~
-python tools/collate_exemplar_dict.py --lvis-dir datasets/lvis --imagenet-dir datasets/imagenet --visual-genome-dir datasets/VisualGenome --output-path datasets/metadata/exemplar_dict.json
+python tools/collate_exemplar_dict.py --lvis-dir datasets/lvis --imagenet-dir datasets/imagenet/imagenet21k_P --visual-genome-dir datasets/VisualGenome --output-path datasets/metadata/exemplar_dict.json
 ~~~
 This will create `datasets/metadata/exemplar_dict.json` which is a dictionary of exemplars with
 at least 10 exemplars per LVIS category.

@@ -99,7 +99,7 @@ def get_args():
     parser.add_argument(
         "--imagenet-img-dir",
         type=str,
-        default="datasets/imagenet"
+        default="datasets/imagenet/imagenet21k_P"
     )
     parser.add_argument(
         "--visual-genome-img-dir",

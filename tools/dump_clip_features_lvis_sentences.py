@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "--out-path",
         type=str,
-        default="datasets/metadata/lvis_gpt3_text-davinci-002_features_author.npy"
+        default="datasets/metadata/lvis_gpt3_text-davinci-002_features_author_vit-b-32-classname.npy"
     )
     parser.add_argument('--model', default='clip')
     parser.add_argument('--clip_model', default="ViT-B/32")
@@ -36,7 +36,12 @@ if __name__ == '__main__':
 
     lvis_cats = ann_data['categories']
     lvis_cats = [(c['id'], c['synonyms'][0].replace("_", " ")) for c in lvis_cats]
-    sentences_per_cat = [descriptions[c[1]] for c in lvis_cats]
+
+    # a/an class name
+    sentences_per_cat = [["an " + c[1]] if c[1][0] in ['a','e', 'i', 'o', 'u'] else ["a " + c[1]] for c in lvis_cats]
+    print(sentences_per_cat)
+    # chatgpt prompt
+    # sentences_per_cat = [descriptions[c[1]] for c in lvis_cats]
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(
@@ -48,6 +53,7 @@ if __name__ == '__main__':
         import clip
         print('Loading CLIP')
         model, preprocess = clip.load(args.clip_model, device=device)
+
         model.eval()
         all_text_features = []
         for cat_sentences in tqdm(sentences_per_cat):
@@ -67,10 +73,10 @@ if __name__ == '__main__':
             all_text_features.append(text_features.mean(dim=0))
         all_text_features = torch.stack(all_text_features)
         print("Output text features shape: ", all_text_features.shape)
-        text_features = text_features.cpu().numpy()
+        all_text_features = all_text_features.cpu().numpy()
 
     else:
         assert 0, "Model {} is not supported only clip".format(args.model)
     if args.out_path != '':
-        print('saveing to', args.out_path)
-        np.save(open(args.out_path, 'wb'), text_features)
+        print('saveing all text feature to', args.out_path, all_text_features.shape)
+        np.save(open(args.out_path, 'wb'), all_text_features)

@@ -20,6 +20,8 @@ from detectron2.data.detection_utils import convert_image_to_rgb
 from torch.cuda.amp import autocast
 from ..text.text_encoder import build_text_encoder
 from ..utils import load_class_freq, get_fed_loss_inds
+import random
+# random.seed
 
 @META_ARCH_REGISTRY.register()
 class CustomRCNN(GeneralizedRCNN):
@@ -37,9 +39,11 @@ class CustomRCNN(GeneralizedRCNN):
         cap_batch_ratio = 4,
         with_caption = False,
         dynamic_classifier = False,
+        max_num_box = -1,
         **kwargs):
         """
         """
+        self.max_num_box = max_num_box
         self.with_image_labels = with_image_labels
         self.dataset_loss_weight = dataset_loss_weight
         self.fp16 = fp16
@@ -55,7 +59,7 @@ class CustomRCNN(GeneralizedRCNN):
             self.num_sample_cats = kwargs.pop('num_sample_cats')
         super().__init__(**kwargs)
         assert self.proposal_generator is not None
-        if self.with_caption:
+        if self.with_caption: # False
             assert not self.dynamic_classifier
             self.text_encoder = build_text_encoder(pretrain=True)
             for v in self.text_encoder.parameters():
@@ -74,6 +78,7 @@ class CustomRCNN(GeneralizedRCNN):
             'dynamic_classifier': cfg.MODEL.DYNAMIC_CLASSIFIER,
             'roi_head_name': cfg.MODEL.ROI_HEADS.NAME,
             'cap_batch_ratio': cfg.MODEL.CAP_BATCH_RATIO,
+            'max_num_box': cfg.MAX_NUM_BOX,
         })
         if ret['dynamic_classifier']:
             ret['freq_weight'] = load_class_freq(
@@ -95,6 +100,7 @@ class CustomRCNN(GeneralizedRCNN):
 
         images = self.preprocess_image(batched_inputs)
         features = self.backbone(images.tensor)
+        # print(features.shape)
         proposals, _ = self.proposal_generator(images, features, None)
         results, _ = self.roi_heads(images, features, proposals)
         if do_postprocess:
@@ -118,6 +124,17 @@ class CustomRCNN(GeneralizedRCNN):
 
         ann_type = 'box'
         gt_instances = [x["instances"].to(self.device) for x in batched_inputs]
+
+        batch_size_per_card = images.tensor.shape[0]
+        
+        gt_nums = 0
+        if self.max_num_box>0 and self.training:
+            for ind in range(len(gt_instances)):
+                if len(gt_instances[ind])>self.max_num_box:
+                    select_index = torch.randperm(len(gt_instances[ind]))[:self.max_num_box]
+                    gt_instances[ind] = gt_instances[ind][select_index]
+                gt_nums += len(gt_instances[ind])
+
         if self.with_image_labels:
             for inst, x in zip(gt_instances, batched_inputs):
                 inst._ann_type = x['ann_type']

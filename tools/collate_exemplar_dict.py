@@ -72,6 +72,7 @@ def main(args):
     synsets_pos_off = [os.path.basename(d) for d in synsets_pos_off_paths]
     available_imagenet_synsets = [wn.synset_from_pos_and_offset(a[0], int(a[1:])) for a in synsets_pos_off]
     direct_match_imagenet_synsets = [v for v in available_imagenet_synsets if v.name() in synset2catid.keys()]
+    print(len(direct_match_imagenet_synsets))
     assert len(direct_match_imagenet_synsets) == 997
     exemplar_dict_imagenet = defaultdict(list)
 
@@ -216,6 +217,8 @@ def main(args):
     manual_exemplar_dict = defaultdict(list)
 
     remaining_lacking_synsets = [(k, len(v)) for k, v in exemplar_dict_combined_three.items() if len(v) < 10]
+    print(len(remaining_lacking_synsets))
+    print(len(manual_synsets))
     assert len(remaining_lacking_synsets) == len(manual_synsets) == 43
 
     for k, v in tqdm(manual_synsets.items(), total=len(remaining_lacking_synsets)):

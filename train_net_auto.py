@@ -117,7 +117,7 @@ class LatestCheckpointer:
         self.checkpointer.save(name, **kwargs)
 
 
-def do_test(cfg, model):
+def do_test(cfg, model, sleep_time=0):
     results = OrderedDict()
     for d, dataset_name in enumerate(cfg.DATASETS.TEST):
         if cfg.MODEL.RESET_CLS_TESTS:
@@ -128,7 +128,7 @@ def do_test(cfg, model):
         mapper = None if cfg.INPUT.TEST_INPUT_TYPE == 'default' \
             else DatasetMapper(
                 cfg, False, augmentations=build_custom_augmentation(cfg, False))
-        data_loader = build_detection_test_loader(cfg, dataset_name, mapper=mapper)
+        data_loader = build_detection_test_loader(cfg, dataset_name, mapper=mapper, batch_size=1)
         output_folder = os.path.join(
             cfg.OUTPUT_DIR, "inference_{}".format(dataset_name))
         evaluator_type = MetadataCatalog.get(dataset_name).evaluator_type
@@ -139,15 +139,22 @@ def do_test(cfg, model):
             evaluator = COCOEvaluator(dataset_name, cfg, True, output_folder)
         else:
             assert 0, evaluator_type
-
+        
         results[dataset_name] = inference_on_dataset(
             model, data_loader, evaluator)
+        comm.synchronize()
         if comm.is_main_process():
             logger.info("Evaluation results for {} in csv format:".format(
                 dataset_name))
             print_csv_format(results[dataset_name])
     if len(results) == 1:
         results = list(results.values())[0]
+    
+    comm.synchronize()
+    if sleep_time>0:
+        print("sleep ", sleep_time, "!!!!!!!!!!!!!")
+        import time
+        time.sleep(sleep_time)
     return results
 
 
@@ -284,7 +291,7 @@ def setup(args):
         else:
             file_name = os.path.basename(args.config_file)[:-5]
             cfg.OUTPUT_DIR = cfg.OUTPUT_DIR.replace('/auto', '/{}'.format(file_name))
-        print(cfg.OUTPUT_DIR)
+        print("### output dir is", cfg.OUTPUT_DIR)
     cfg.freeze()
     default_setup(cfg, args)
     setup_logger(
@@ -297,12 +304,7 @@ def main(args):
 
     model = build_model(cfg)
     logger.info("Model:\n{}".format(model))
-    if args.eval_only:
-        DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
-            cfg.MODEL.WEIGHTS, resume=args.resume
-        )
-
-        return do_test(cfg, model)
+    
 
     distributed = comm.get_world_size() > 1
     if distributed:
@@ -310,9 +312,15 @@ def main(args):
             model, device_ids=[comm.get_local_rank()], broadcast_buffers=False,
             find_unused_parameters=cfg.FIND_UNUSED_PARAM
         )
+    if args.eval_only:
+        DetectionCheckpointer(model, save_dir=cfg.OUTPUT_DIR).resume_or_load(
+            cfg.MODEL.WEIGHTS, resume=args.resume
+        )
 
+        return do_test(cfg, model, sleep_time=cfg.SLEEP_TIME)
+    
     do_train(cfg, model, resume=args.resume)
-    return do_test(cfg, model)
+    return do_test(cfg, model, sleep_time=cfg.SLEEP_TIME)
 
 
 if __name__ == "__main__":
@@ -341,3 +349,4 @@ if __name__ == "__main__":
         dist_url=args.dist_url,
         args=(args,),
     )
+    

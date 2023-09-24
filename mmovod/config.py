@@ -9,8 +9,8 @@ def add_mmovod_config(cfg):
 
     # Open-vocabulary classifier
     _C.MODEL.ROI_BOX_HEAD.USE_ZEROSHOT_CLS = False  # Use fixed classifier for open-vocabulary detection
-    _C.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'datasets/metadata/lvis_v1_clip_a+cname.npy'
-    _C.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_DIM = 512
+    _C.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'datasets/metadata/lvis_gpt3_text-davinci-002_features_author_vit-l.npy'
+    _C.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_DIM = 768
     _C.MODEL.ROI_BOX_HEAD.NORM_WEIGHT = True
     _C.MODEL.ROI_BOX_HEAD.NORM_TEMP = 50.0
     _C.MODEL.ROI_BOX_HEAD.IGNORE_ZERO_CATS = False
@@ -85,6 +85,7 @@ def add_mmovod_config(cfg):
 
     _C.SOLVER.USE_CUSTOM_SOLVER = False
     _C.SOLVER.OPTIMIZER = 'SGD'
+    # _C.SOLVER.OPTIMIZER = 'SGD'
 
     _C.INPUT.CUSTOM_AUG = ''
     _C.INPUT.TRAIN_SIZE = 640
@@ -100,6 +101,8 @@ def add_mmovod_config(cfg):
     _C.IS_DEBUG = False
     _C.QUICK_DEBUG = False
     _C.FP16 = False
+    _C.SLEEP_TIME = 0
+    _C.MAX_NUM_BOX = -1
     _C.EVAL_AP_FIX = False
     _C.GEN_PSEDO_LABELS = False
     _C.SAVE_DEBUG_PATH = 'output/save_debug/'
