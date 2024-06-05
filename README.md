@@ -11,8 +11,9 @@ The challenge of open-vocabulary recognition lies in the model has no clue of ne
 
 
 ## Highlights
-
-<img src="./images/OVMR_architecture.png" style="width: 50%; height: auto;" />
+<div style="text-align: center;">
+    <img src="./images/OVMR_architecture.png" alt="OVMR Architecture" style="width: 50%; height: auto;">
+</div>
 
 ## Results
 
@@ -27,11 +28,11 @@ The challenge of open-vocabulary recognition lies in the model has no clue of ne
 <img src="./images/OVMR_table2.png" style="width: 100%; height: auto;" />
 
 ### Open-Vocabulary Detection
-
-<img src="./images/OVMR_table3.png" style="width: 50%; height: auto;" />
-
-
+<div style="text-align: center;">
+    <img src="./images/OVMR_table3.png" style="width: 50%; height: auto;" />
+</div>
 
 ### The Influence of  Exemplar Image's Number.
-
-<img src="./images/Shot_Figure.png" style="width: 50%; height: auto;" />
+<div style="text-align: center;">
+    <img src="./images/Shot_Figure.png" style="width: 50%; height: auto;" />
+</div>
