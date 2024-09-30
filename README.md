@@ -11,7 +11,10 @@ The challenge of open-vocabulary recognition lies in the model has no clue of ne
 
 
 ## Highlights
-<p style="text-align: center;">
+
++ [2024.09.30] The code for open-vocabulary classification has been released. 
+
+<p align="center">
     <img src="./docs/images/OVMR_architecture.png" alt="OVMR Architecture" style="width: 50%; height: auto;">
 </p>
 
@@ -126,7 +129,7 @@ pip install -e .
 
 ### The Influence of  Exemplar Image's Number.
 
-<p style="text-align: center;">
+<p align="center">
     <img src="./docs/images/Shot_Figure.png" width="50%"/>
 </p>
 
