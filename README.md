@@ -46,11 +46,12 @@ pip install -e .
   ln -s /path/to/imagenet21k ./data/imagenet21k/images
   ```
 
-+ download the `imagenet21k-OVR` from here. Put `shot_64-seed_1.pkl` into `./data/imagenet21k/split_fewshot/`. The structure will look like:
++ download the `imagenet21k-OVR` from [here](https://huggingface.co/datasets/zehongma/ImageNet21k_OVR). Put `shot_64-seed_1.pkl` into `./data/imagenet21k/split_fewshot/`. The structure will look like:
 
   ```bash
   data
   |–– imagenet21k/
+  |   |–– imagenet21k_OVR_classnames.txt
   |   |–– split_fewshot/
   |   |   |–– shot_64-seed_1.pkl
   |   |–– images/
@@ -115,11 +116,17 @@ pip install -e .
 
 + Few-Shot Prompt Learning Methods
 
-<img src="./docs/images/OVMR_table1.png" style="width: 100%; height: auto;" />
+<p align="center">
+    <img src="./docs/images/OVMR_table1.png"/>
+</p>
 
 + Traditional Few-shot Methods
 
-<img src="./docs/images/OVMR_table2.png" style="width: 100%; height: auto;" />
+<p align="center">
+    <img src="./docs/images/OVMR_table2.png"/>
+</p>
+
+
 
 ### Open-Vocabulary Detection
 
