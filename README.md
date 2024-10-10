@@ -46,7 +46,7 @@ pip install -e .
   ln -s /path/to/imagenet21k ./data/imagenet21k/images
   ```
 
-+ download the `imagenet21k-OVR` from [here](https://huggingface.co/datasets/zehongma/ImageNet21k_OVR). Put `shot_64-seed_1.pkl` into `./data/imagenet21k/split_fewshot/`. The structure will look like:
++ download the `imagenet21k-OVR` from [here](https://huggingface.co/datasets/zehongma/ImageNet21k_OVR). Put `imagenet21k_OVR_classnames.txt` into `./data/imagenet21k/` and  `shot_64-seed_1.pkl` into `./data/imagenet21k/split_fewshot/`. The structure will look like:
 
   ```bash
   data
