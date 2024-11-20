@@ -129,10 +129,10 @@ dmypy.json
 .pyre/
 
 # Custom
-output/
-data/
+/output/
+/data/
 nas_data/
-output*
-foutput*
-baseline*
-debug.sh
+/output*
+/foutput*
+/baseline*
+/debug.sh
