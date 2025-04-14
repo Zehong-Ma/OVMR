@@ -6,17 +6,17 @@ def get_args():
     parser.add_argument(
         "--feat1-path",
         type=str,
-        default="datasets/metadata/lvis_gpt3_text-davinci-002_features_author.npy"
+        default="datasets/metadata/lvis_ours_vit-b-32-classname.npy"
     )
     parser.add_argument(
         "--feat2-path",
         type=str,
-        default="datasets/metadata/lvis_image_exemplar_features_avg_K-005_own.npy"
+        default="datasets/metadata/lvis_image_exemplar_features_avg_K-005_author.npy"
     )
     parser.add_argument(
         "--out-path",
         type=str,
-        default="datasets/metadata/lvis_multi-modal_avg_K-005_own.npy"
+        default="datasets/metadata/lvis_multi-modal_avg_K-005_classname.npy"
     )
     return parser.parse_args()
 

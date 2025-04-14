@@ -31,19 +31,53 @@ def get_fed_loss_inds(gt_classes, num_sample_cats, C, weight=None):
 
 def reset_cls_test(model, cls_path, num_classes):
     model.roi_heads.num_classes = num_classes
-    if type(cls_path) == str:
-        print('Resetting zs_weight', cls_path)
-        zs_weight = torch.tensor(
-            np.load(cls_path), 
-            dtype=torch.float32).permute(1, 0).contiguous() # D x C
-    else:
-        zs_weight = cls_path
-    zs_weight = torch.cat(
-        [zs_weight, zs_weight.new_zeros((zs_weight.shape[0], 1))], 
-        dim=1) # D x (C + 1)
-    if model.roi_heads.box_predictor[0].cls_score.norm_weight:
-        zs_weight = F.normalize(zs_weight, p=2, dim=0)
-    zs_weight = zs_weight.to(model.device)
-    for k in range(len(model.roi_heads.box_predictor)):
-        del model.roi_heads.box_predictor[k].cls_score.zs_weight
-        model.roi_heads.box_predictor[k].cls_score.zs_weight = zs_weight
+    # if type(cls_path) == str:
+    #     print('Resetting zs_weight', cls_path)
+    #     zs_weight = torch.tensor(
+    #         np.load(cls_path), 
+    #         dtype=torch.float32).permute(1, 0).contiguous() # D x C
+    # else:
+    #     zs_weight = cls_path
+    # zs_weight = torch.cat(
+    #     [zs_weight, zs_weight.new_zeros((zs_weight.shape[0], 1))], 
+    #     dim=1) # D x (C + 1)
+    # if model.roi_heads.box_predictor[0].cls_score.norm_weight:
+    #     zs_weight = F.normalize(zs_weight, p=2, dim=0)
+
+    prompt_model_params = torch.load(cls_path, map_location="cpu")         
+    t_zs_weight = torch.tensor(
+        prompt_model_params["text_classifier"],
+        dtype=torch.float32).permute(1, 0).contiguous()  # D x C
+    v_zs_weight = torch.tensor(
+            prompt_model_params["vision_classifier"],
+            dtype=torch.float32).permute(1, 0).contiguous()
+    mm_zs_weight = torch.tensor(
+            prompt_model_params["mm_classifier"],
+            dtype=torch.float32).permute(1, 0).contiguous()
+    
+    fusion_weight = torch.tensor(
+            prompt_model_params["fusion_weight"],
+            dtype=torch.float32) # 
+    
+    t_zs_weight = torch.cat(
+        [t_zs_weight, t_zs_weight.new_zeros((t_zs_weight.shape[0], 1))],
+        dim=1)  # D x (C + 1)
+    v_zs_weight = torch.cat(
+        [v_zs_weight, v_zs_weight.new_zeros((t_zs_weight.shape[0], 1))],
+        dim=1)  # D x (C + 1)
+    mm_zs_weight = torch.cat(
+        [mm_zs_weight, mm_zs_weight.new_zeros((t_zs_weight.shape[0], 1))],
+        dim=1)  # D x (C + 1)
+    fusion_weight = torch.cat([fusion_weight, fusion_weight.new_ones((1,3))], dim=0)
+
+    t_zs_weight = t_zs_weight.to(model.device)
+    v_zs_weight = v_zs_weight.to(model.device)
+    mm_zs_weight = mm_zs_weight.to(model.device)
+    # zs_weight = zs_weight.to(model.device)
+    # for k in range(len(model.roi_heads.box_predictor)):
+    #     del model.roi_heads.box_predictor[k].cls_score.t_zs_weight
+    #     del model.roi_heads.box_predictor[k].cls_score.v_zs_weight
+    #     del model.roi_heads.box_predictor[k].cls_score.mm_zs_weight
+    #     model.roi_heads.box_predictor[k].cls_score.t_zs_weight = t_zs_weight
+    #     model.roi_heads.box_predictor[k].cls_score.v_zs_weight = v_zs_weight
+    #     model.roi_heads.box_predictor[k].cls_score.mm_zs_weight = mm_zs_weight

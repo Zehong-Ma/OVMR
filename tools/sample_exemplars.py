@@ -20,12 +20,12 @@ def get_args():
     parser.add_argument(
         "--out-path",
         type=str,
-        default="datasets/metadata/lvis_image_exemplar_dict_K-005_own.json"
+        default="datasets/metadata/lvis_image_exemplar_dict_K-030_own.json"
     )
     parser.add_argument(
         "-K",
         type=int,
-        default=5
+        default=30
     )
     parser.add_argument(
         "--seed",
@@ -47,15 +47,15 @@ def run(catid2synset, exemplar_dict, K, seed, out_path):
         try:
             chosen_anns = rng.choice(trial_anns, size=K, p=probs, replace=False)
         except:
-            chosen_anns = rng.choice(trial_anns, size=10, p=probs, replace=False)
+            chosen_anns = rng.choice(trial_anns, size=K, p=probs, replace=True)
             print(cat_id)
             # print(chosen_anns)
         chosen_anns_all.append(chosen_anns.tolist())
     with open(out_path, "w") as f:
         json.dump(chosen_anns_all, f)
-    ten_shot_chosen_anns = [ann_[:10] for ann_ in chosen_anns_all]
-    with open("datasets/metadata/lvis_image_exemplar_dict_20_own_first10.json", "w") as f:
-        json.dump(ten_shot_chosen_anns, f)
+    # ten_shot_chosen_anns = [ann_[:10] for ann_ in chosen_anns_all]
+    # with open("datasets/metadata/lvis_image_exemplar_dict_20_own_first10.json", "w") as f:
+    #     json.dump(ten_shot_chosen_anns, f)
 
 
 def main(args):

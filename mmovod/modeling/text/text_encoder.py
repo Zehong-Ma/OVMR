@@ -7,6 +7,7 @@ from collections import OrderedDict
 import torch
 from torch import nn
 import torch
+from mmovod.modeling.clip.model import convert_weights
 
 from mmovod.modeling.clip.simple_tokenizer import SimpleTokenizer as _Tokenizer
 
@@ -197,6 +198,7 @@ def build_text_encoder(pretrain=True, model_name="ViT-B/32"):
             if k in state_dict:
                 del state_dict[k]
         print('Loading pretrained CLIP')
+        convert_weights(text_encoder)
         text_encoder.load_state_dict(state_dict)
     # import pdb; pdb.set_trace()
     return text_encoder

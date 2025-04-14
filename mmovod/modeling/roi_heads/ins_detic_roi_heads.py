@@ -91,7 +91,7 @@ class InsDeticCascadeROIHeads(CascadeROIHeads):
         return ret
 
     def _forward_box(self, features, proposals, targets=None, 
-        ann_type='box', classifier_info=(None,None,None)):
+        ann_type='box', classifier_info=(None,None,None), iteration=None):
         """
         Add mult proposal scores at testing
         Add ann_type
@@ -115,8 +115,9 @@ class InsDeticCascadeROIHeads(CascadeROIHeads):
                 if self.training and ann_type in ['box']:
                     proposals = self._match_and_label_boxes(
                         proposals, k, targets)
+            train_proposal_scores = [p.get('objectness_logits') for p in proposals] if (len(proposals) > 0 and proposals[0].has('objectness_logits')) else [p.get('scores') for p in proposals]
             predictions = self._run_stage(features, proposals, k, 
-                classifier_info=classifier_info)
+                classifier_info=classifier_info, objectness_scores=train_proposal_scores, iteration=iteration)
             prev_pred_boxes = self.box_predictor[k].predict_boxes(
                 (predictions[0], predictions[1]), proposals)
             head_outputs.append((self.box_predictor[k], predictions, proposals))
@@ -172,7 +173,7 @@ class InsDeticCascadeROIHeads(CascadeROIHeads):
             return pred_instances
 
     def forward(self, images, features, proposals, targets=None,
-        ann_type='box', classifier_info=(None,None,None)):
+        ann_type='box', classifier_info=(None,None,None), iteration=None):
         '''
         enable debug and image labels
         classifier_info is shared across the batch
@@ -185,7 +186,7 @@ class InsDeticCascadeROIHeads(CascadeROIHeads):
                 proposals = self.get_top_proposals(proposals)
             
             losses = self._forward_box(features, proposals, targets, \
-                ann_type=ann_type, classifier_info=classifier_info)
+                ann_type=ann_type, classifier_info=classifier_info, iteration=iteration)
             if ann_type == 'box' and targets[0].has('gt_masks'):
                 mask_losses = self._forward_mask(features, proposals)
                 losses.update({k: v * self.mask_weight \
@@ -259,7 +260,7 @@ class InsDeticCascadeROIHeads(CascadeROIHeads):
 
 
     def _run_stage(self, features, proposals, stage, \
-        classifier_info=(None,None,None)):
+        classifier_info=(None,None,None), objectness_scores=None, iteration=None):
         """
         Support classifier_info and add_feature_to_prop
         """
@@ -283,4 +284,4 @@ class InsDeticCascadeROIHeads(CascadeROIHeads):
         else:
             labels = None
         # print(labels.min(), labels.max())
-        return self.box_predictor[stage](box_features, classifier_info=classifier_info, labels=labels)
+        return self.box_predictor[stage](box_features, classifier_info=classifier_info, labels=labels, objectness_scores=objectness_scores, iteration=iteration)

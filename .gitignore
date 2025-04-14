@@ -1,4 +1,6 @@
 output/
 datasets/
 checkpoints/
-datasets
+visuali*
+configs
+scripts/

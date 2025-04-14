@@ -164,6 +164,7 @@ class InsDeticFastRCNNOutputLayers(FastRCNNOutputLayers):
         gt_classes = (
             cat([p.gt_classes for p in proposals], dim=0) if len(proposals) else torch.empty(0)
         )
+        
         num_classes = self.num_classes
         if self.dynamic_classifier:
             _, cls_id_map = classifier_info[1]
@@ -184,7 +185,10 @@ class InsDeticFastRCNNOutputLayers(FastRCNNOutputLayers):
 
         if self.use_sigmoid_ce:
             loss_cls = self.sigmoid_cross_entropy_loss(scores, gt_classes)
-            loss_rerank_cls = self.sigmoid_topk_cross_entropy_loss(rerank_logits, rerank_binary_labels)
+            if rerank_logits is not None:
+                loss_rerank_cls = self.sigmoid_topk_cross_entropy_loss(rerank_logits, rerank_binary_labels)
+            else:
+                loss_rerank_cls = torch.zeros(1).cuda()[0]
             # loss_rerank_cls = self.softmax_cross_entropy_loss(scores_rerank, gt_classes)
         else:
             loss_cls = self.softmax_cross_entropy_loss(scores, gt_classes)
@@ -445,7 +449,7 @@ class InsDeticFastRCNNOutputLayers(FastRCNNOutputLayers):
             'loss_box_reg': score.new_zeros([1])[0]}
 
 
-    def forward(self, x, classifier_info=(None,None,None), labels=None):
+    def forward(self, x, classifier_info=(None,None,None), labels=None, objectness_scores=None, iteration=None):
         """
         enable classifier_info
         """
@@ -454,7 +458,7 @@ class InsDeticFastRCNNOutputLayers(FastRCNNOutputLayers):
         assert classifier_info[0] is None
         assert classifier_info[1] is None
         
-        cls_scores, cls_scores_reranked = self.cls_score(x, labels=labels)
+        cls_scores, cls_scores_reranked = self.cls_score(x, labels=labels, objectness_scores=objectness_scores, iteration=iteration)
 
         proposal_deltas = self.bbox_pred(x)
         if self.with_softmax_prop:

@@ -160,6 +160,14 @@ def do_test(cfg, model, sleep_time=0):
 
 def do_train(cfg, model, resume=False):
     model.train()
+    # if cfg.TRAINING_STAGE==2:
+    #     # only train the instance linear and bias
+    #     for k, v in model.named_parameters():
+    #         if "ins_linear" in k or "ins_bias" in k:
+    #             v.requires_grad=True
+    #         else:
+    #             v.requires_grad=False
+
     if cfg.SOLVER.USE_CUSTOM_SOLVER:
         optimizer = build_custom_optimizer(cfg, model)
     else:
@@ -172,11 +180,15 @@ def do_train(cfg, model, resume=False):
     for n, p in model.named_parameters():
         if p.requires_grad:
             logger.info("{}".format(n))
-
-    checkpointer = DetectionCheckpointer(
-        model, cfg.OUTPUT_DIR, optimizer=optimizer, scheduler=scheduler
-    )
-
+    if cfg.TRAINING_STAGE==1:
+        checkpointer = DetectionCheckpointer(
+            model, cfg.OUTPUT_DIR, optimizer=optimizer, scheduler=scheduler
+        )
+    else:
+        checkpointer = DetectionCheckpointer(
+            model, cfg.MODEL.WEIGHTS, optimizer=optimizer, scheduler=scheduler
+        )
+        checkpointer.save_dir = cfg.OUTPUT_DIR
     start_iter = checkpointer.resume_or_load(
         cfg.MODEL.WEIGHTS, resume=resume).get("iteration", -1) + 1
     if not resume:
@@ -222,9 +234,8 @@ def do_train(cfg, model, resume=False):
             storage.put_scalars(data_time=data_time)
             step_timer.reset()
             iteration = iteration + 1
-            storage.step()
-            loss_dict = model(data)
-
+            storage.step() 
+            loss_dict = model(data, iteration=iteration)   
             losses = sum(
                 loss for k, loss in loss_dict.items())
             assert torch.isfinite(losses).all(), loss_dict
@@ -331,7 +342,7 @@ if __name__ == "__main__":
             torch.randint(11111, 60000, (1,))[0].item())
     else:
         if args.dist_url == 'host':
-            args.dist_url = 'tcp://{}:12345'.format(
+            args.dist_url = 'tcp://{}:12845'.format(
                 os.environ['SLURM_JOB_NODELIST'])
         elif not args.dist_url.startswith('tcp'):
             tmp = os.popen(

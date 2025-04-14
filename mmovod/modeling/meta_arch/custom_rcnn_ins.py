@@ -112,7 +112,7 @@ class CustomRCNNINS(GeneralizedRCNN):
             return results
 
 
-    def forward(self, batched_inputs: List[Dict[str, torch.Tensor]]):
+    def forward(self, batched_inputs: List[Dict[str, torch.Tensor]], iteration=None):
         """
         Add ann_type
         Ignore proposal loss when training with image labels
@@ -184,7 +184,7 @@ class CustomRCNNINS(GeneralizedRCNN):
         else:
             proposals, detector_losses = self.roi_heads(
                 images, features, proposals, gt_instances,
-                ann_type=ann_type, classifier_info=classifier_info)
+                ann_type=ann_type, classifier_info=classifier_info, iteration=iteration)
         
         if self.vis_period > 0:
             storage = get_event_storage()

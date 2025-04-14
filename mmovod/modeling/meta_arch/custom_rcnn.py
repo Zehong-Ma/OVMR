@@ -112,7 +112,7 @@ class CustomRCNN(GeneralizedRCNN):
             return results
 
 
-    def forward(self, batched_inputs: List[Dict[str, torch.Tensor]]):
+    def forward(self, batched_inputs: List[Dict[str, torch.Tensor]], iteration=None):
         """
         Add ann_type
         Ignore proposal loss when training with image labels
@@ -136,6 +136,7 @@ class CustomRCNN(GeneralizedRCNN):
                 gt_nums += len(gt_instances[ind])
 
         if self.with_image_labels:
+            # print(len(gt_instances))
             for inst, x in zip(gt_instances, batched_inputs):
                 inst._ann_type = x['ann_type']
                 inst._pos_category_ids = x['pos_category_ids']

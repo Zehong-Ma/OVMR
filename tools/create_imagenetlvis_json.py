@@ -12,7 +12,7 @@ def get_code(syn):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--imagenet-path', default='datasets/imagenet/imagenet21k_P')
+    parser.add_argument('--imagenet-path', default='datasets/imagenet/imagenet22k')
     parser.add_argument('--lvis-meta-path', default='datasets/lvis/lvis_v1_val.json')
     parser.add_argument('--out-path', default='datasets/imagenet/annotations/imagenet_lvis_image_info.json')
     args = parser.parse_args()
@@ -30,8 +30,11 @@ if __name__ == '__main__':
             synset2folders["stop_sign.n.01"] = []
             continue
         code = get_code(wn.synset(synset))
+        # folders = [
+        #     os.path.join(args.imagenet_path, folder, code) for folder in ["train", "val", "imagenet21k_small_classes"]
+        # ]
         folders = [
-            os.path.join(args.imagenet_path, folder, code) for folder in ["train", "val", "imagenet21k_small_classes"]
+            os.path.join(args.imagenet_path, code)
         ]
         synset2folders[synset] = [f for f in folders if os.path.exists(f)]
 
@@ -49,7 +52,8 @@ if __name__ == '__main__':
                 count = count + 1
                 # file_name only needs to be last two parts of path
                 # import pdb; pdb.set_trace()
-                file_name = '{}/{}/{}'.format(*(folder.split("/")[-2:]), file)
+                # file_name = '{}/{}/{}'.format(*(folder.split("/")[-2:]), file)
+                file_name = '{}/{}'.format(*(folder.split("/")[-1:]), file)
                 assert os.path.join(folder, file) == os.path.join(args.imagenet_path, file_name)
                 img = read_image(os.path.join(args.imagenet_path, file_name))
                 h, w = img.shape[:2]

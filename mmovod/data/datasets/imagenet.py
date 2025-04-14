@@ -20,7 +20,7 @@ def custom_register_imagenet_instances(name, metadata, json_file, image_root):
 
 _CUSTOM_SPLITS_IMAGENET = {
     "imagenet_lvis_v1": (
-        "imagenet/imagenet21k_P/",
+        "imagenet/imagenet_l/",
         "imagenet/annotations/imagenet_lvis_image_info.json",
     ),
 }

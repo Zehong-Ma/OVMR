@@ -84,18 +84,14 @@ def get_args():
     parser.add_argument(
         "--ann-path",
         type=str,
-        default="datasets/metadata/lvis_image_exemplar_dict_final_own.json"
+        default= "datasets/metadata/lvis_image_exemplar_dict_K-030_own.json"#"datasets/metadata/lvis_image_exemplar_dict_K-005_author.json"
     )
     parser.add_argument(
-        "--mmovd_ann-path",
+        "--train_ann_path",
         type=str,
-        default="datasets/metadata/lvis_image_exemplar_dict_K-005_author.json"
+        default= "datasets/metadata/lvis_image_exemplar_dict_K-030_own.json"#"datasets/metadata/lvis_image_exemplar_dict_K-016_own.json"
     )
-    parser.add_argument(
-        "--output-path",
-        type=str,
-        default="datasets/metadata/lvis_image_exemplar_features_avg_K-005_own.npy"
-    )
+    
     parser.add_argument(
         "--lvis-img-dir",
         type=str,
@@ -109,7 +105,7 @@ def get_args():
     parser.add_argument(
         "--save_dir",
         type=str,
-        default="datasets/lvis_exemplars_final"
+        default="datasets/lvis_exemplars_mmovod_K30"
     )
     parser.add_argument(
         "--visual-genome-img-dir",
@@ -134,12 +130,13 @@ class CropDataset(Dataset):
     def __init__(
         self,
         exemplar_dict,
+        train_exemplar_dict,
         args,
     ):
         self.exemplar_dict = exemplar_dict
-        with open("datasets/metadata/lvis_image_exemplar_dict_K-005_author.json", "r") as fp:
-            self.exemplar_dict_mmovd = json.load(fp)
-        
+        # with open("datasets/metadata/lvis_image_exemplar_dict_K-005_author.json", "r") as fp:
+        #     self.exemplar_dict_mmovd = json.load(fp)
+        self.train_exemplar_dict = train_exemplar_dict
         self.paths = {
             "imagenet21k": args.imagenet_img_dir,
             "visual_genome": args.visual_genome_img_dir,
@@ -148,47 +145,43 @@ class CropDataset(Dataset):
         self.save_dir = args.save_dir
         if os.path.exists(self.save_dir) is False:
             os.makedirs(self.save_dir)
-            os.makedirs(os.path.join(self.save_dir, "train"))
+            # os.makedirs(os.path.join(self.save_dir, "train"))
             os.makedirs(os.path.join(self.save_dir, "val"))
-            os.makedirs(os.path.join(self.save_dir, "all"))
+            # os.makedirs(os.path.join(self.save_dir, "all"))
 
     def __len__(self):
         return len(self.exemplar_dict)
 
     def __getitem__(self, idx):
         val_anns = self.exemplar_dict[idx]
-        train_anns = self.exemplar_dict_mmovd[idx]
+        train_anns = self.train_exemplar_dict[idx]
         val_crops = [run_crop(ann, self.paths) for ann in val_anns]
-        train_crops = [run_crop(ann, self.paths) for ann in train_anns]
+        train_crops = [run_crop(train_ann, self.paths) for train_ann in train_anns]
         # add the tta in here somewhere
         # num_per_class = len(val_crops)
-        save_folder = os.path.join(self.save_dir, "all", str(val_anns[0]['category_id']))
-        if os.path.exists(os.path.join(self.save_dir, "train", str(val_anns[0]['category_id']))) is False:
-            os.makedirs(os.path.join(self.save_dir, "train", str(val_anns[0]['category_id'])))
-        if os.path.exists(os.path.join(self.save_dir, "all", str(val_anns[0]['category_id']))) is False:
-            os.makedirs(os.path.join(self.save_dir, "all", str(val_anns[0]['category_id'])))
+        category_id = idx
+        save_folder = os.path.join(self.save_dir, "all", str(category_id))
 
-        train_file_names = [ann_['file_name'].split("/")[-1] for ann_ in train_anns]
+        if os.path.exists(os.path.join(self.save_dir, "val", str(category_id))) is False:
+            os.makedirs(os.path.join(self.save_dir, "val", str(category_id)))
+        if os.path.exists(os.path.join(self.save_dir, "train", str(category_id))) is False:
+            os.makedirs(os.path.join(self.save_dir, "train", str(category_id)))
+        # train_file_names = [ann_['file_name'].split("/")[-1] for ann_ in train_anns]
         val_num_ins = 0
         for i in range(len(val_crops)):
-            if val_anns[i]['file_name'].split("/")[-1] not in train_file_names:
-                save_file_name = "val_%d_%s_%s"%(val_num_ins, val_anns[i]['dataset'], val_anns[i]['file_name'].split("/")[-1])
-                if os.path.exists(os.path.join(self.save_dir, "val", str(val_anns[0]['category_id']))) is False:
-                    os.makedirs(os.path.join(self.save_dir, "val", str(val_anns[0]['category_id'])))
-                val_crops[i].save(os.path.join(self.save_dir, "val", str(val_anns[0]['category_id']), save_file_name))
-                val_crops[i].save(os.path.join(self.save_dir, "all", str(val_anns[0]['category_id']), save_file_name))
-                val_num_ins +=1
-        for i in range(len(train_crops)):
-            save_file_name = "train_%d_%s_%s"%(i, train_anns[i]['dataset'], train_anns[i]['file_name'].split("/")[-1])
-            try:
-                if os.path.exists(os.path.join(self.save_dir, "train", str(train_anns[0]['category_id']))) is False:
-                    os.makedirs(os.path.join(self.save_dir, "train", str(train_anns[0]['category_id'])))
-                train_crops[i].save(os.path.join(self.save_dir, "train", str(train_anns[0]['category_id']), save_file_name))
-                train_crops[i].save(os.path.join(self.save_dir, "all", str(train_anns[0]['category_id']), save_file_name))
-            except:
-                print(train_anns[i], "error in this line")
-           
-        return val_anns[0]['synset'], val_num_ins
+            save_file_name = "val_%d_%s_%s"%(val_num_ins, val_anns[i]['dataset'], val_anns[i]['file_name'].split("/")[-1])
+            if os.path.exists(os.path.join(self.save_dir, "val", str(category_id))) is False:
+                os.makedirs(os.path.join(self.save_dir, "val", str(category_id)))
+            val_crops[i].save(os.path.join(self.save_dir, "val", str(category_id), save_file_name))
+            val_num_ins +=1
+        train_num_ins = 0
+        for j in range(len(train_crops)):
+            save_file_name = "train_%d_%s_%s"%(train_num_ins, train_anns[j]['dataset'], train_anns[j]['file_name'].split("/")[-1])
+            if os.path.exists(os.path.join(self.save_dir, "train", str(category_id))) is False:
+                os.makedirs(os.path.join(self.save_dir, "train", str(category_id)))
+            train_crops[j].save(os.path.join(self.save_dir, "train", str(category_id), save_file_name))
+            train_num_ins += 1
+        return category_id, val_num_ins
 
 
 def run(anns_path,  args):
@@ -198,8 +191,10 @@ def run(anns_path,  args):
     with open(anns_path, "r") as fp:
         exemplar_dict = json.load(fp)
     
+    with open(args.train_ann_path, "r") as fp2:
+        train_exemplar_dict = json.load(fp2)
     
-    dataset = CropDataset(exemplar_dict, args)
+    dataset = CropDataset(exemplar_dict, train_exemplar_dict, args)
     dataloader = DataLoader(
         dataset, batch_size=1, shuffle=False, pin_memory=True, num_workers=1)
 

@@ -19,7 +19,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "--out-path",
         type=str,
-        default="datasets/metadata/lvis_gpt3_text-davinci-002_features_author_vit-b-32-classname.npy"
+        default="datasets/metadata/lvis_ours_vit-b-32-classname.npy"
     )
     parser.add_argument('--model', default='clip')
     parser.add_argument('--clip_model', default="ViT-B/32")
@@ -38,7 +38,8 @@ if __name__ == '__main__':
     lvis_cats = [(c['id'], c['synonyms'][0].replace("_", " ")) for c in lvis_cats]
 
     # a/an class name
-    sentences_per_cat = [["an " + c[1]] if c[1][0] in ['a','e', 'i', 'o', 'u'] else ["a " + c[1]] for c in lvis_cats]
+    # sentences_per_cat = [["an " + c[1]] if c[1][0] in ['a','e', 'i', 'o', 'u'] else ["a " + c[1]] for c in lvis_cats]
+    sentences_per_cat = [["a " + c[1] + "."]  for c in lvis_cats]
     print(sentences_per_cat)
     # chatgpt prompt
     # sentences_per_cat = [descriptions[c[1]] for c in lvis_cats]

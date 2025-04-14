@@ -6,7 +6,8 @@ def add_mmovod_config(cfg):
     _C = cfg
 
     _C.WITH_IMAGE_LABELS = False  # Turn on co-training with classification data
-
+    _C.TRAINING_STAGE = 1
+    _C.CLASSIFIER_NAME = "multimodal"
     # Open-vocabulary classifier
     _C.MODEL.ROI_BOX_HEAD.USE_ZEROSHOT_CLS = False  # Use fixed classifier for open-vocabulary detection
     _C.MODEL.ROI_BOX_HEAD.ZEROSHOT_WEIGHT_PATH = 'datasets/metadata/lvis_gpt3_text-davinci-002_features_author_vit-l.npy'

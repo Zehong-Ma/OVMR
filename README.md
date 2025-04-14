@@ -1,16 +1,4 @@
-# Multi-Modal Classifiers for Open-Vocabulary Object Detection
-
-<p align="center"> <img src='docs/teaser.jpg' align="center" height="500px"> </p>
-
-> [**Multi-Modal Classifiers for Open Vocabulary Object Detection**](https://arxiv.org/abs/2306.05493),           
-> Prannay Kaul, Weidi Xie, Andrew Zisserman                 
-> *ICML 2023 ([arXiv 2201.02605](https://arxiv.org/abs/2306.05493))*         
-
-
-## Updates
-
-- **June 2023** Code and checkpoints for LVIS models in the main paper are released. Training code for visual aggregator to follow soon.
-
+# Open-Vocabulary Recognition with Multi-Modal References
 
 ## Installation
 
@@ -36,3 +24,15 @@ If you find this project useful for your research, please use the following BibT
       booktitle={ICML},
       year={2023}
     }
+
+python demo.py --config-file configs/mm_classifier_swin_b_box_visualization.yaml --input datasets/coco/val2017/*.jpg --output visualization_img_output_mask_novel --vocabulary lvis --confidence-threshold 0.5 --opts MODEL.WEIGHTS checkpoints/model_final_swinb.pth
+
+python demo.py --config-file configs/mm_classifier_swin_b_box_visualization.yaml --input visualization_img_input/1.mp4 --output visualize_videos --vocabulary lvis --confidence-threshold 0.5 --opts MODEL.WEIGHTS checkpoints/model_final_swinb.pth
+
+
+114770.jpg
+
+8211
+16228
+
+16958

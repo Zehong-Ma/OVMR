@@ -26,6 +26,8 @@ def build_custom_optimizer(cfg: CfgNode, model: torch.nn.Module) -> torch.optim.
     optimizer_type = cfg.SOLVER.OPTIMIZER
     for key, value in model.named_parameters(recurse=True):
         if not value.requires_grad:
+            # print("frozen_parameters in the model are: ")
+            # print(key)
             continue
         # Avoid duplicating parameters
         if value in memo:
