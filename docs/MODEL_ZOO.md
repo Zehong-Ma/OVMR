@@ -1,9 +1,9 @@
-# Multi-Modal Open-Vocabulary Object Detection Model Zoo
+# Open-Vocabulary Recognition with Multi-Modal References
 
 ## Introduction
 
 This file documents a collection of models reported in our paper.
-Training in all cases is done with 4 32GB V100 GPUs.
+Training in all cases is done with 4 24GB 3090 GPUs.
 
 #### How to Read the Tables
 
@@ -20,30 +20,25 @@ To evaluate a model with a trained/ pretrained model, run
 python train_net_auto.py --num-gpus 4 --config-file /path/to/config/name.yaml --eval-only MODEL.WEIGHTS /path/to/weight.pth
 ```
 
+#### Fast Demo
+```shell
+# image detection
+python demo.py --config-file configs/mm_classifier_swin_b_box_visualization.yaml --input datasets/coco/val2017/*.jpg --output visualization_imgs --vocabulary lvis --confidence-threshold 0.5 --opts MODEL.WEIGHTS checkpoints/model_final_swinb.pth
 
+# video detection
+python demo.py --config-file configs/mm_classifier_swin_b_box_visualization.yaml --input visualization_img_input/1.mp4 --output visualize_videos --vocabulary lvis --confidence-threshold 0.5 --opts MODEL.WEIGHTS checkpoints/model_final_swinb.pth
+```
 ## Open-vocabulary LVIS
 
 | Name                                                                                                                   |  APr |  mAP | Weights                                                          |
 |------------------------------------------------------------------------------------------------------------------------|:----:|:----:|------------------------------------------------------------------|
-| [lvis-base_r50_4x_clip_gpt3_descriptions](../configs/lvis-base_r50_4x_clip_gpt3_descriptions.yaml)                     | 19.3 | 30.3 | [model](https://www.robots.ox.ac.uk/~prannay/public_models/mm-ovod/lvis-base_r50_4x_clip_gpt3_descriptions.pth.tar) |
-| [lvis-base_r50_4x_clip_image_exemplars_avg](../configs/lvis-base_r50_4x_clip_image_exemplars_avg.yaml)                 | 14.8 | 28.8 | [model](https://www.robots.ox.ac.uk/~prannay/public_models/mm-ovod/lvis-base_r50_4x_clip_image_exemplars_avg.pth.tar) |
-| [lvis-base_r50_4x_clip_image_exemplars_agg](../configs/lvis-base_r50_4x_clip_image_exemplars_agg.yaml)                 | 18.3 | 29.2 | [model](https://www.robots.ox.ac.uk/~prannay/public_models/mm-ovod/lvis-base_r50_4x_clip_image_exemplars_agg.pth.tar) |
-| [lvis-base_r50_4x_clip_multi_modal_avg](../configs/lvis-base_r50_4x_clip_multi_modal_avg.yaml)                         | 20.7 | 30.5 | [model](https://www.robots.ox.ac.uk/~prannay/public_models/mm-ovod/lvis-base_r50_4x_clip_multi_modal_avg.pth.tar) |
-| [lvis-base_r50_4x_clip_multi_modal_agg](../configs/lvis-base_r50_4x_clip_multi_modal_agg.yaml)                         | 19.2 | 30.6 | [model](https://www.robots.ox.ac.uk/~prannay/public_models/mm-ovod/lvis-base_r50_4x_clip_multi_modal_agg.pth.tar) |
-| [lvis-base_in-l_r50_4x_4x_clip_gpt3_descriptions](../configs/lvis-base_in-l_r50_4x_4x_clip_gpt3_descriptions.yaml)     | 25.8 | 32.6 | [model](https://www.robots.ox.ac.uk/~prannay/public_models/mm-ovod/lvis-base_in-l_r50_4x_4x_clip_gpt3_descriptions.pth.tar) |
-| [lvis-base_in-l_r50_4x_4x_clip_image_exemplars_avg](../configs/lvis-base_in-l_r50_4x_4x_clip_image_exemplars_avg.yaml) | 21.6 | 31.3 | [model](https://www.robots.ox.ac.uk/~prannay/public_models/mm-ovod/lvis-base_in-l_r50_4x_4x_clip_image_exemplars_avg.pth.tar) |
-| [lvis-base_in-l_r50_4x_4x_clip_image_exemplars_agg](../configs/lvis-base_in-l_r50_4x_4x_clip_image_exemplars_agg.yaml) | 23.8 | 31.3 | [model](https://www.robots.ox.ac.uk/~prannay/public_models/mm-ovod/lvis-base_in-l_r50_4x_4x_clip_image_exemplars_agg.pth.tar) |
-| [lvis-base_in-l_r50_4x_4x_clip_multi_modal_avg](../configs/lvis-base_in-l_r50_4x_4x_clip_multi_modal_avg.yaml)         | 26.5 | 32.8 | [model](https://www.robots.ox.ac.uk/~prannay/public_models/mm-ovod/lvis-base_in-l_r50_4x_4x_clip_multi_modal_avg.pth.tar) |
-| [lvis-base_in-l_r50_4x_4x_clip_multi_modal_agg](../configs/lvis-base_in-l_r50_4x_4x_clip_multi_modal_agg.yaml)         | 27.3 | 33.1 | [model](https://www.robots.ox.ac.uk/~prannay/public_models/mm-ovod/lvis-base_in-l_r50_4x_4x_clip_multi_modal_agg.pth.tar) |
+| [lvis-RN50](../configs/mm_classifier.yaml)                     | 21.2 | 30.0 | [model](https://drive.google.com/file/d/19fknyb6MlrgnjWGFYedgB4FRgQwInQQw/view?usp=drive_link) |
+| [lvis-SwinB](../configs/mm_classifier_swin_b_imagenet.yaml)                 | 34.4 | 40.9 | [model](https://drive.google.com/file/d/1SM3G4N_ZYnQ5CGH_K36gSTpEvM6O2yvd/view?usp=drive_link) |
 
 
 #### Note
 
 - The open-vocabulary LVIS setup is LVIS without rare class annotations in training. We evaluate rare classes as novel classes in testing.
 
-- All models use [CLIP](https://github.com/openai/CLIP) embeddings as classifiers. This makes the box-supervised models have non-zero mAP on novel classes.
-
 - The models with `in-l` use the overlap classes between ImageNet-21K and LVIS as image-labeled data.
-
-- The models which are trained on `in-l` require the corresponding models _without_ `in-l` (indicated by MODEL.WEIGHTS in the config files). Please train or download the model without `in-l` and place them under `${mm-ovod_ROOT}/output/..` before training the model using `in-l` (check the config file).
 

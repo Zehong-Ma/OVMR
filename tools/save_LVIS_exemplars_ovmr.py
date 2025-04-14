@@ -84,12 +84,12 @@ def get_args():
     parser.add_argument(
         "--ann-path",
         type=str,
-        default= "datasets/metadata/lvis_image_exemplar_dict_K-030_own.json"#"datasets/metadata/lvis_image_exemplar_dict_K-005_author.json"
+        default= "datasets/metadata/lvis_image_exemplar_dict_K-030_own.json"
     )
     parser.add_argument(
         "--train_ann_path",
         type=str,
-        default= "datasets/metadata/lvis_image_exemplar_dict_K-030_own.json"#"datasets/metadata/lvis_image_exemplar_dict_K-016_own.json"
+        default= "datasets/metadata/lvis_image_exemplar_dict_K-030_own.json"
     )
     
     parser.add_argument(
@@ -105,7 +105,7 @@ def get_args():
     parser.add_argument(
         "--save_dir",
         type=str,
-        default="datasets/lvis_exemplars_mmovod_K30"
+        default="datasets/lvis_exemplars_ovmr_K30"
     )
     parser.add_argument(
         "--visual-genome-img-dir",

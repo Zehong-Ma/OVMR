@@ -17,22 +17,13 @@ See [Detic](https://github.com/facebookresearch/Detic). Our code is based on thi
 ## Citation
 
 If you find this project useful for your research, please use the following BibTeX entry.
-
-    @inproceedings{Kaul2023,
-      title={Multi-Modal Classifiers for Open-Vocabulary Object Detection},
-      author={Kaul, Prannay and Xie, Weidi and Zisserman, Andrew},
-      booktitle={ICML},
-      year={2023}
-    }
-
-python demo.py --config-file configs/mm_classifier_swin_b_box_visualization.yaml --input datasets/coco/val2017/*.jpg --output visualization_img_output_mask_novel --vocabulary lvis --confidence-threshold 0.5 --opts MODEL.WEIGHTS checkpoints/model_final_swinb.pth
-
-python demo.py --config-file configs/mm_classifier_swin_b_box_visualization.yaml --input visualization_img_input/1.mp4 --output visualize_videos --vocabulary lvis --confidence-threshold 0.5 --opts MODEL.WEIGHTS checkpoints/model_final_swinb.pth
-
-
-114770.jpg
-
-8211
-16228
-
-16958
+```
+@InProceedings{Ma_2024_CVPR,
+    author    = {Ma, Zehong and Zhang, Shiliang and Wei, Longhui and Tian, Qi},
+    title     = {OVMR: Open-Vocabulary Recognition with Multi-Modal References},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+    month     = {June},
+    year      = {2024},
+    pages     = {16571-16581}
+}
+```
