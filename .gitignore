@@ -136,3 +136,4 @@ nas_data/
 /foutput*
 /baseline*
 /debug.sh
+/checkpoints/prompt_learner/model.pth.tar-30

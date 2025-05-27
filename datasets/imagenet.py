@@ -30,8 +30,6 @@ class ImageNet(DatasetBase):
             text_file = os.path.join(self.dataset_dir, "classnames.txt")
             classnames = self.read_classnames(text_file)
             train = self.read_data(classnames, "train")
-            # Follow standard practice to perform evaluation on the val set
-            # Also used as the val set (so evaluate the last-step model)
             test = self.read_data(classnames, "val")
 
             preprocessed = {"train": train, "test": test}
@@ -39,11 +37,9 @@ class ImageNet(DatasetBase):
                 pickle.dump(preprocessed, f, protocol=pickle.HIGHEST_PROTOCOL)
 
         num_shots = cfg.DATASET.NUM_SHOTS
-        if num_shots >= 1:
+        if num_shots >= 1: # Notice: randomly sample num_shots images for each class
             seed = cfg.SEED
             preprocessed = os.path.join(self.split_fewshot_dir, f"shot_{num_shots}-seed_{seed}.pkl")
-            # preprocessed_eval_seen = os.path.join(self.split_fewshot_dir, f"shot_{num_shots}-seed_{seed}-eval-seen.pkl")
-            # preprocessed_eval_unseen = os.path.join(self.split_fewshot_dir, f"shot_{num_shots}-seed_{seed}-eval-unseen.pkl")
             if os.path.exists(preprocessed):
                 print(f"Loading preprocessed few-shot data from {preprocessed}")
                 with open(preprocessed, "rb") as file:
@@ -51,9 +47,7 @@ class ImageNet(DatasetBase):
                     train = data["train"]
             else:
                 train = self.generate_fewshot_dataset(train, num_shots=num_shots)
-                # eval_seen = self.generate_fewshot_dataset_eval(train, num_shots=num_shots, is_seen=True, seed=seed)
-                # eval_unseen = self.generate_fewshot_dataset_eval(train, num_shots=num_shots, is_seen=False, seed=seed) # select from training set
-                
+               
                 data = {"train": train}
                 # print(train)
                 print(f"Saving preprocessed few-shot data to {preprocessed}")
@@ -62,7 +56,7 @@ class ImageNet(DatasetBase):
             # file_paths = [for item in train]
         subsample = cfg.DATASET.SUBSAMPLE_CLASSES
         
-        train, test = OxfordPets.subsample_classes(train, test, subsample=subsample)
+        train, test = OxfordPets.subsample_classes(train, test, subsample=subsample) # This line can be deleted because this function will sample `base` or `new` according to our evaluation protocol.
        
         super().__init__(train_x=train, val=test, test=test, eval_set=train)
 

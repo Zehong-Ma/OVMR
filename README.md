@@ -110,6 +110,19 @@ pip install -e .
   sh eval.sh
   ```
 
+## Generate Classifiers for Customized Datasets
+
+### Download Pretrained Weights
++ download the pretrained weights of visual token generator from [here](https://drive.google.com/file/d/1gnhzomp4hKHBnQs65VtpxTSCd95S1p_T/view?usp=drive_link)
+
+### Define Customized Dataset
++ Please adapt the file(`./datasets/imagenet.py`) for your datasets. You should split your dataset into `train` and `test` set, where the `train` set will be utilized as `eval_set` to generate multi-modal classifiers. Please carefully read each line in `./datasets/imagenet.py` and then modify the code.
++ Register your dataset in `./configs/datasets` by creating a new yaml.
++ Run the following command and you will find the `mm_classifiers.pt` in the dir `ourput_ovmr`. Utilize the classifiers(`text_classifier(Original CLIP)`, `vision_classifier`, `mm_classifier`) in `mm_classifiers.pt` to replace the open-vocabulary classifier in your project.
+  ```bash
+  bash scripts/mm_cls/generate_classifier.sh <Your_Dataset_Name> 1 base 2 fusion 10 0
+  ```
+
 ## Results
 
 ### Open-Vocabulary Classification

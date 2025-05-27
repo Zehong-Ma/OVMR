@@ -4,9 +4,9 @@ DATALOADER:
     SAMPLER: "RandomClassSampler"
     N_INS: 8
   TEST:
-    BATCH_SIZE: 512
+    BATCH_SIZE: 256
     N_INS: 16
-  NUM_WORKERS: 12
+  NUM_WORKERS: 8
   K_TRANSFORMS: 1
 
 INPUT:
