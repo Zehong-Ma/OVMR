@@ -11,7 +11,8 @@ The challenge of open-vocabulary recognition lies in the model has no clue of ne
 
 
 ## Highlights
-+ [2024.04.14] The code for open-vocabulary detection has been released in another [branch](https://github.com/Zehong-Ma/OVMR/tree/det).
++ [2025.06.16] Update the download link of pretrained weights in [Huggingface](https://huggingface.co/zehongma/OVMR).
++ [2025.04.14] The code for open-vocabulary detection has been released in another [branch](https://github.com/Zehong-Ma/OVMR/tree/det).
 + [2024.09.30] The code for open-vocabulary classification has been released. 
 
 <p align="center">
