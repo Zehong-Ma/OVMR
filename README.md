@@ -11,7 +11,7 @@ The challenge of open-vocabulary recognition lies in the model has no clue of ne
 
 
 ## Highlights
-
++ [2024.04.14] The code for open-vocabulary detection has been released in another [branch](https://github.com/Zehong-Ma/OVMR/tree/det).
 + [2024.09.30] The code for open-vocabulary classification has been released. 
 
 <p align="center">
@@ -113,10 +113,12 @@ pip install -e .
 ## Generate Classifiers for Customized Datasets
 
 ### Pretrained Weights
-+ download the pretrained weights of visual token generator from [here](https://drive.google.com/file/d/1gnhzomp4hKHBnQs65VtpxTSCd95S1p_T/view?usp=drive_link)
+
++ download the pretrained weights of visual token generator from [here](https://huggingface.co/zehongma/OVMR/tree/main/prompt_learner). You should put `checkpoint` and `model.pth.tar-30` in to the `prompt_learner` folder or other customized folder.
 
 ### Customized Dataset
 + Please adapt the file(`./datasets/imagenet.py`) for your datasets. You should split your dataset into `train` and `test` set, where the `train` set will be utilized as `eval_set` to generate multi-modal classifiers. Please carefully read each line in `./datasets/imagenet.py` and then modify the code.
+
 + Register your dataset in `./configs/datasets` by creating a new yaml.
 
 ### Scripts
